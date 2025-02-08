@@ -16,6 +16,10 @@ public class AdminAPIController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Gets a list of all administrators.
+    /// </summary>
+    /// <returns>A list of Admin objects.</returns>
     [HttpGet("Admins")] // Combined route: "api/AdminAPI/Admins"
     public async Task<ActionResult<IEnumerable<Admin>>> GetAdmins()
     {
@@ -30,12 +34,17 @@ public class AdminAPIController : ControllerBase
                 User_phone = admin.User_phone,
                 Password_hash = admin.Password_hash,
                 Category = admin.Category
-                // Corrected property name from AdminName to AdminUsername
             });
         }
-        return Ok(adminList); // Moved outside the loop
+        return Ok(adminList);
     }
-    [HttpGet(template: "Admin{id}")]
+
+    /// <summary>
+    /// Retrieves a specific administrator by their ID.
+    /// </summary>
+    /// <param name="id">The ID of the admin to retrieve.</param>
+    /// <returns>An Admin object or a NotFound result if not found.</returns>
+    [HttpGet("Admin{id}")]
     public async Task<ActionResult<Admin>> FindAdmin(int id)
     {
         var admin = await _context.Admin.FindAsync(id);
@@ -50,45 +59,72 @@ public class AdminAPIController : ControllerBase
             User_phone = admin.User_phone,
             Password_hash = admin.Password_hash,
             Category = admin.Category
-
-            // Corrected property name from AdminName to AdminUsername
         };
         return Ok(admins);
     }
-    [HttpPost(template: "AddAdmin")]
-    public async Task<ActionResult<Admin>> AddAdmin(AdminDto addadmin)
+
+    /// <summary>
+    /// Adds a new administrator.
+    /// </summary>
+    /// <param name="addadmin">The admin data to be added.</param>
+    /// <returns>A success message along with the newly created admin's ID.</returns>
+    [HttpPost("AddAdmin")]
+    public async Task<IActionResult> AddAdmin(AdminDto addadmin)
     {
-        Admin admin = new Admin()
+        try
         {
-            Username = addadmin.Username,
-            User_phone = addadmin.User_phone,
-            Password_hash = addadmin.Password_hash,
-            Category = addadmin.Category
-        };
-        _context.Admin.Add(admin);
-        await _context.SaveChangesAsync();
-        AdminDto adminDto = new AdminDto()
+            // Validate the input
+            if (string.IsNullOrEmpty(addadmin.Username) || string.IsNullOrEmpty(addadmin.Password_hash))
+            {
+                return BadRequest(new { message = "Username and Password are required." });
+            }
+            if (string.IsNullOrEmpty(addadmin.User_phone))
+            {
+                return BadRequest(new { message = "User phone number is required." });
+            }
+
+            // Create new Admin object
+            Admin admin = new Admin()
+            {
+                Username = addadmin.Username,
+                User_phone = addadmin.User_phone,
+                Password_hash = addadmin.Password_hash,
+                Category = addadmin.Category
+            };
+
+            // Save to the database
+            _context.Admin.Add(admin);
+            await _context.SaveChangesAsync();
+
+            // Return success message with Admin ID
+            return CreatedAtAction("FindAdmin", new { id = admin.User_Id },
+                new { message = $"Admin {admin.User_Id} created successfully.", admin });
+        }
+        catch (Exception ex)
         {
-            User_Id = admin.User_Id,
-            Username = admin.Username,
-            User_phone = admin.User_phone,
-            Password_hash = admin.Password_hash,
-            Category = admin.Category
-        };
-        return CreatedAtAction("FindAdmin", new { id = admin.User_Id }, adminDto);
+            // Log the error (Optional)
+            Console.WriteLine($"Error: {ex.Message}");
+
+            // Return error message
+            return StatusCode(500, new { message = "An error occurred while creating the admin.", error = ex.Message });
+        }
     }
+
+    /// <summary>
+    /// Updates the details of an existing administrator.
+    /// </summary>
+    /// <param name="id">The ID of the admin to update.</param>
+    /// <param name="updateadmin">The updated admin data.</param>
+    /// <returns>A success message if updated successfully or a NotFound result.</returns>
     [HttpPut("UpdateAdmin/{id}")]
     public async Task<IActionResult> UpdateAdmin(int id, Admin updateadmin)
     {
-        // if (id != updateadmin.User_Id)
-        // {
-        //     return BadRequest();
-        // }
         var admin = await _context.Admin.FindAsync(id);
         if (admin == null)
         {
             return NotFound();
         }
+
         // Update only the necessary fields
         admin.User_Id = id;
         admin.Username = updateadmin.Username;
@@ -100,7 +136,6 @@ public class AdminAPIController : ControllerBase
         try
         {
             await _context.SaveChangesAsync();
-
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -113,9 +148,14 @@ public class AdminAPIController : ControllerBase
                 throw;
             }
         }
-        return NoContent();
+        return Ok($"Admin {admin.User_Id} updated successfully.");
     }
 
+    /// <summary>
+    /// Deletes an administrator by their ID.
+    /// </summary>
+    /// <param name="id">The ID of the admin to delete.</param>
+    /// <returns>A success message if deleted successfully or a NotFound result.</returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAdmin(int id)
     {
@@ -123,13 +163,17 @@ public class AdminAPIController : ControllerBase
         if (admin == null)
         {
             return NotFound();
-            // return NotFound();
         }
         _context.Admin.Remove(admin);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok($"Admin {admin.User_Id} deleted successfully.");
     }
 
+    /// <summary>
+    /// Checks whether an admin exists by their ID.
+    /// </summary>
+    /// <param name="id">The ID of the admin.</param>
+    /// <returns>True if the admin exists, otherwise false.</returns>
     private bool AdminExists(int id)
     {
         return _context.Admin.Any(e => e.User_Id == id);

@@ -1,4 +1,5 @@
 global using HitchList.Data;
+using System.Configuration;
 using System.Text.Json.Serialization;
 using HitchList.Models;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-  options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")),
+        mySqlOptions => mySqlOptions.MigrationsHistoryTable("__EFMigrationsHistory")
+    ));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services

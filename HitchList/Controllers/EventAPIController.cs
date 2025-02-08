@@ -11,10 +11,16 @@ using System.Collections.Generic;
 public class EventAPIController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+
     public EventAPIController(ApplicationDbContext context)
     {
         _context = context;
     }
+
+    /// <summary>
+    /// Gets the list of all events.
+    /// </summary>
+    /// <returns>A list of all events.</returns>
     [HttpGet("Event")] // Combined route: "api/EventAPI/Event"
     public async Task<ActionResult<IEnumerable<Event>>> GetEvent()
     {
@@ -29,13 +35,17 @@ public class EventAPIController : ControllerBase
                 Date = eventItem.Date,
                 Location = eventItem.Location,
                 Category = eventItem.Category
-                // Corrected property name from EventName to EventUsername
             });
-
         }
         return Ok(eventList); // Moved outside the loop
     }
-    [HttpGet(template: "Event{id}")]
+
+    /// <summary>
+    /// Finds a specific event by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the event.</param>
+    /// <returns>The event with the specified ID, or a NotFound response if not found.</returns>
+    [HttpGet("Event{id}")]
     public async Task<ActionResult<Event>> FindEvent(int id)
     {
         var eventItem = await _context.Event.FindAsync(id);
@@ -50,12 +60,16 @@ public class EventAPIController : ControllerBase
             Date = eventItem.Date,
             Location = eventItem.Location,
             Category = eventItem.Category
-
-            // Corrected property name from EventName to EventUsername
         };
         return Ok(events);
     }
-    [HttpPost(template: "AddEvent")]
+
+    /// <summary>
+    /// Adds a new event to the database.
+    /// </summary>
+    /// <param name="addEvent">The event details to be added.</param>
+    /// <returns>The newly created event.</returns>
+    [HttpPost("AddEvent")]
     public async Task<ActionResult<Event>> AddEvent(EventDto addEvent)
     {
         Event eventItem = new Event()
@@ -67,16 +81,24 @@ public class EventAPIController : ControllerBase
         };
         _context.Event.Add(eventItem);
         await _context.SaveChangesAsync();
+
         EventDto eventDto = new EventDto()
         {
-
             Name = eventItem.Name,
             Date = eventItem.Date.HasValue ? eventItem.Date.Value : DateTime.Now,
             Location = eventItem.Location,
             Category = eventItem.Category
         };
+
         return CreatedAtAction("FindEvent", new { id = eventItem.Id }, eventDto);
     }
+
+    /// <summary>
+    /// Updates an existing event.
+    /// </summary>
+    /// <param name="id">The ID of the event to update.</param>
+    /// <param name="updateEvent">The updated event details.</param>
+    /// <returns>A NoContent response if successful, or NotFound if the event doesn't exist.</returns>
     [HttpPut("UpdateEvent/{id}")]
     public async Task<IActionResult> UpdateEvent(int id, Event updateEvent)
     {
@@ -85,6 +107,7 @@ public class EventAPIController : ControllerBase
         {
             return NotFound();
         }
+
         tasks.Id = id;
         tasks.Name = updateEvent.Name;
         tasks.Date = updateEvent.Date;
@@ -95,7 +118,6 @@ public class EventAPIController : ControllerBase
         try
         {
             await _context.SaveChangesAsync();
-
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -111,6 +133,11 @@ public class EventAPIController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Deletes a specific event by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the event to delete.</param>
+    /// <returns>A NoContent response if successful, or NotFound if the event doesn't exist.</returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEvent(int id)
     {
@@ -119,11 +146,17 @@ public class EventAPIController : ControllerBase
         {
             return NotFound();
         }
+
         _context.Event.Remove(eventItem);
         await _context.SaveChangesAsync();
         return NoContent();
     }
 
+    /// <summary>
+    /// Checks if an event exists in the database.
+    /// </summary>
+    /// <param name="id">The ID of the event.</param>
+    /// <returns>True if the event exists, otherwise false.</returns>
     private bool EventExists(int id)
     {
         return _context.Event.Any(e => e.Id == id);

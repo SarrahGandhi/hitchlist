@@ -9,7 +9,7 @@ public class Event
     public int Id { get; set; }
     [Required]
     [StringLength(255)]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public DateTime? Date { get; set; }
 
@@ -29,9 +29,9 @@ public enum EventCategory
 public class EventDto
 {
     public int EventId { get; set; }
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public DateTime Date { get; set; }
-    public string Location { get; set; }
+    public string? Location { get; set; }
     [Column(TypeName = "varchar(10)")] // Ensures storage as a string
     [JsonConverter(typeof(JsonStringEnumConverter))] // Enables JSON serialization as a string
     public EventCategory Category { get; set; }

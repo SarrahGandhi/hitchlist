@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HitchList")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efaced1acdee0ce9604c7118998b5ad3c8613a28")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2982364de2ad0de914efbc5b8ba5389aa7301c9")]
 [assembly: System.Reflection.AssemblyProductAttribute("HitchList")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HitchList")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
