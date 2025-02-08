@@ -2,13 +2,14 @@
 
 ## Description
 
-HitchList is a web application API that allows users to manage events, guests, and tasks. This project uses ASP.NET Core Web API and Entity Framework Core for data handling. It provides endpoints for CRUD operations (Create, Read, Update, Delete) on events, guests, and tasks.
+HitchList is a web application API that allows users to manage admin,events, guests, and tasks for a wedding. This project uses ASP.NET Core Web API and Entity Framework Core for data handling. It provides endpoints for CRUD operations (Create, Read, Update, Delete) on events, guests, and tasks.
 
 ## Features
 
 - **Events**: Manage events including their name, date, location, and category.
 - **Guests**: Add and manage guest information, including invitation status and category.
 - **Tasks**: Create and update tasks, with descriptions, due dates, and categories.
+- **Admin**: Admins to access and make changes to events, guests and tasks.
 
 ## Technologies Used
 
