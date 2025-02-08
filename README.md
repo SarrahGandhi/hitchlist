@@ -29,7 +29,7 @@ HitchList is a web application API that allows users to manage events, guests, a
 1. Clone the repository to your local machine:
 
     ```bash
-    git clone https://github.com/your-username/HitchList.git
+    https://github.com/SarrahGandhi/hitchlist.git
     ```
 
 2. Navigate to the project folder:
@@ -56,7 +56,7 @@ HitchList is a web application API that allows users to manage events, guests, a
     dotnet run
     ```
 
-6. The API will be hosted on `https://localhost:5001` or `http://localhost:5000`.
+
 
 ## API Endpoints
 
