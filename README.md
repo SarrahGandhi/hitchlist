@@ -85,16 +85,3 @@ HitchList is a web application API that allows users to manage admin,events, gue
 - **PUT /api/TaskAPI/UpdateTask/{id}**: Update an existing task
 - **DELETE /api/TaskAPI/{id}**: Delete a task
 
-## Data Models
-
-### Event
-
-```csharp
-public class Event
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public DateTime Date { get; set; }
-    public string Location { get; set; }
-    public string Category { get; set; }
-}
